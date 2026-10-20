@@ -124,12 +124,13 @@ export function registerTools(server: McpServer): void {
       subject: z.string().describe("Email subject"),
       body: z.string().describe("Email body. Plain text, or HTML when it starts with <!doctype html> or <html> (sent as text/html). No attachments."),
       cc: z.string().optional().describe("CC addresses (comma-separated)"),
+      bcc: z.string().optional().describe("BCC addresses (comma-separated)"),
       reply_to_message_id: z.string().optional().describe("Message ID to reply to"),
       reply_to_thread_id: z.string().optional().describe("Thread ID to reply into"),
       account: z.string().email().optional().describe("Gmail account to send from (defaults to first)"),
       from_name: z.string().optional().describe("Display name to show as sender (e.g., 'The Desk'). Falls back to the bare email address if omitted."),
     },
-    async ({ to, subject, body, cc, reply_to_message_id, reply_to_thread_id, account, from_name }) => {
+    async ({ to, subject, body, cc, bcc, reply_to_message_id, reply_to_thread_id, account, from_name }) => {
       const email = resolveAccount(account);
       const gmail = makeGmailClient(getAuthClient(email));
       const messageId = await sendEmail(gmail, email, {
@@ -137,6 +138,7 @@ export function registerTools(server: McpServer): void {
         subject,
         body,
         cc,
+        bcc,
         replyToMessageId: reply_to_message_id,
         replyToThreadId: reply_to_thread_id,
         fromName: from_name,

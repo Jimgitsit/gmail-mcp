@@ -102,6 +102,7 @@ export interface SendOptions {
   replyToMessageId?: string;
   replyToThreadId?: string;
   cc?: string;
+  bcc?: string;
   fromName?: string;
 }
 
@@ -149,6 +150,7 @@ export async function sendEmail(
 ): Promise<string> {
   const extraHeaders: string[] = [];
   if (opts.cc) extraHeaders.push(`Cc: ${opts.cc}`);
+  if (opts.bcc) extraHeaders.push(`Bcc: ${opts.bcc}`);
   if (opts.replyToMessageId) {
     extraHeaders.push(`In-Reply-To: <${opts.replyToMessageId}>`);
     extraHeaders.push(`References: <${opts.replyToMessageId}>`);
