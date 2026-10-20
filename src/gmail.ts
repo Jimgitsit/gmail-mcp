@@ -104,6 +104,8 @@ export interface SendOptions {
   cc?: string;
   bcc?: string;
   fromName?: string;
+  // Extra raw headers, e.g. List-Unsubscribe / List-Unsubscribe-Post (RFC 8058). Values must be ASCII.
+  headers?: Record<string, string>;
 }
 
 function isHtmlBody(body: string): boolean {
@@ -139,6 +141,7 @@ function buildRawEmail(from: string, opts: SendOptions, extraHeaders: string[] =
     `MIME-Version: 1.0`,
     `Content-Type: ${contentType}`,
     ...extraHeaders,
+    ...Object.entries(opts.headers ?? {}).map(([name, value]) => `${name}: ${value}`),
   ].join("\r\n");
   return Buffer.from(`${headers}\r\n\r\n${opts.body}`).toString("base64url");
 }
