@@ -5,6 +5,9 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 
 import { join } from "path";
 import { homedir } from "os";
 
+// Loopback port for the OAuth callback; Desktop-app clients accept any localhost port. Override when 58009 is taken.
+const OAUTH_PORT = Number(process.env.GMAIL_MCP_OAUTH_PORT ?? 58009);
+
 const TOKEN_DIR = join(homedir(), ".config", "gmail-mcp");
 const SCOPES = [
   "https://www.googleapis.com/auth/gmail.readonly",
@@ -38,7 +41,7 @@ export function makeOAuthClient(creds: OAuthCredentials): OAuth2Client {
   return new google.auth.OAuth2(
     creds.client_id,
     creds.client_secret,
-    "http://localhost:58009/oauth/callback"
+    `http://localhost:${OAUTH_PORT}/oauth/callback`
   );
 }
 
@@ -121,8 +124,8 @@ export async function runOAuthFlow(email?: string): Promise<string> {
       cleanup();
       reject(new Error("OAuth flow timed out after 5 minutes"));
     }, 5 * 60 * 1000);
-    server.listen(58009, () => {
-      console.error("Waiting for OAuth callback on port 58009...");
+    server.listen(OAUTH_PORT, () => {
+      console.error(`Waiting for OAuth callback on port ${OAUTH_PORT}...`);
     });
     server.on("error", (err) => {
       cleanup();
